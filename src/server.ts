@@ -5,7 +5,7 @@ import * as parser from "body-parser";
 import * as path from "path";
 import * as hbs from "express-handlebars";
 import {Database} from "sqlite3";
-import {addScore, getAllScores, Score} from "./scores";
+import {addScore, getScores, Score} from "./scores";
 import * as bearerToken from "express-bearer-token";
 
 const db = new Database("data/scores.db", (error: Error) => { if(error) throw error; });
@@ -28,7 +28,7 @@ app.use(parser.urlencoded({ extended: true }));
  */
 app.get("/", async (req: Request, res: Response) => {
     res.render("scores", {
-        scores: await getAllScores()
+        scores: await getScores(100)
     });
 });
 
@@ -38,7 +38,7 @@ app.get("/", async (req: Request, res: Response) => {
 app.get("/api", async (req: Request, res: Response) => {
     let scores;
     try {
-        scores = await getAllScores();
+        scores = await getScores(10);
     } catch(e) {
         res.status(500);
         res.json({error: true, code: 500, description: "Internal Server Error"});

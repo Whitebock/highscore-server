@@ -8,10 +8,12 @@ export interface Score {
     position: number;
 }
 
-/**
- * Get all scores.
- */
-export async function getAllScores() {
+ /**
+  * Get top scores.
+  * @param count How many scores to retrieve.
+  *              Will return all when the number is negative.
+  */
+export async function getScores(count: number = -1) {
     let db: Database = app.get("db");
     const query = `SELECT
     s.id, s.name, s.score
@@ -32,8 +34,13 @@ export async function getAllScores() {
                 row.position = rank;
                 lastScore = row.score;
             }
-            resolve(rows);
-        });  
+
+            if(count < 0) {
+                resolve(rows);
+            } else {
+                resolve(rows.slice(0, count));
+            }
+        });
     });  
 }
 
@@ -42,7 +49,7 @@ export async function getAllScores() {
  * @param id Score id
  */
 export async function findScore(id?: number) {
-    const scores = await getAllScores();
+    const scores = await getScores();
     return scores.find(score => score.id == id);
 }
 
@@ -56,8 +63,8 @@ export async function addScore(username: string, score: number) {
     return new Promise<Score>((resolve, reject) => {
         db.run("INSERT INTO scores(name, score) VALUES (?, ?)", [username, score], async function (error: Error) {
             if (error) throw error;
-            const score = await findScore(this.lastID);
-            resolve(score);
+            const s = await findScore(this.lastID);
+            resolve(s);
         });  
     });  
 }
