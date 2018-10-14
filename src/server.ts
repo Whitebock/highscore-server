@@ -61,6 +61,10 @@ app.put("/api", async (req: Request, res: Response) => {
     let username: string = req.body.username;
     let submittedScore: number = req.body.score;
 
+    if(username.length === 0) {
+        username = "Anon";
+    }
+
     let score: Score;
     try {
         score = await addScore(username, submittedScore);
