@@ -68,3 +68,17 @@ export async function addScore(username: string, score: number) {
         });  
     });  
 }
+
+/**
+ * Delete an existing score.
+ * @param score Score to delete.
+ */
+export async function deleteScore(score: Score) {
+    let db: Database = app.get("db");
+    return new Promise((resolve, reject) => {
+        db.run("DELETE FROM scores WHERE id = ?", [score.id], async function (error: Error) {
+            if (error) throw error;
+            resolve();
+        });  
+    });  
+}

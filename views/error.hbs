@@ -1,15 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>Highscores | {{code}}</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css"
-                  integrity="sha256-oDCP2dNW17Y1QhBwQ+u2kLaKxoauWvIGks3a4as9QKs=" crossorigin="anonymous"/>
-    <title>Kanumann | {{code}}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css" integrity="sha256-oDCP2dNW17Y1QhBwQ+u2kLaKxoauWvIGks3a4as9QKs=" crossorigin="anonymous"/>
+    <style type="text/css">
+    body {
+        margin-top: 10px;
+    }
+    </style>
 </head>
-<body class="ui vertical segment container">
-    <h1 class="ui header">{{code}} - {{description}}</h1>
-    <i class="massive exclamation triangle icon"></i>
+<body class="ui vertical container">
+    <div class="ui padded red segment">
+        <h1 class="ui header">
+            <i class="exclamation triangle icon"></i>
+            {{code}} - {{description}}
+        </h1>
+        The site you requested was not found on this server.
+    </div>
 </body>
 </html>

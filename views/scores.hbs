@@ -1,22 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>Highscores</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css"
-                  integrity="sha256-oDCP2dNW17Y1QhBwQ+u2kLaKxoauWvIGks3a4as9QKs=" crossorigin="anonymous"/>
-    <title>Kanumann | Scores</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css" integrity="sha256-oDCP2dNW17Y1QhBwQ+u2kLaKxoauWvIGks3a4as9QKs=" crossorigin="anonymous"/>
+    <style type="text/css">
+    body {
+        margin-top: 20px;
+    }
+    </style>
 </head>
-<body class="ui vertical segment container">
-    <h1 class="ui header">Scores</h1>
-    <div class="ui container">
-        <table class="ui celled table">
+<body class="ui vertical container">
+    <div class="ui piled segment">
+        <div class="ui left rail">
+            <div class="ui segment">
+                There are {{scores.length}} entries in total.
+            </div>
+        </div>
+        <table class="ui very basic celled table">
             <thead>
                 <tr>
                 <th>Rank</th>
                 <th>Score</th>
                 <th>Name</th>
+                {{#if review}}
+                <th></th>
+                {{/if}}
                 </tr>
             </thead>
             <tbody>
@@ -25,15 +36,43 @@
                 <td data-label="Rank">{{this.position}}</td>
                 <td data-label="Score">{{this.score}}</td>
                 <td data-label="Name">{{this.name}}</td>
+                {{#if ../review}}
+                <td>
+                    <button type="submit" class="ui compact icon button delete" data-id="{{this.id}}">
+                        <i class="trash icon"></i>
+                    </button>
+                </td>
+                {{/if}}
                 </tr>
                 {{/each}}
             </tbody>
-            <tfoot>
-                <tr>
-                <th colspan="3">Top {{scores.length}} Players</th>
-                </tr>
-            </tfoot>
         </table>
     </div>
+    {{#if review}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.js"></script>
+    <script type="text/javascript">
+        $.fn.api.settings.api = {
+            "get scores" : "/api/{/count}",
+            "add score" : "/api",
+            "delete score" : "/api/{id}"
+        };
+        $(".delete").api({
+            action: "delete score",
+            method: "DELETE",
+            beforeXHR: function(xhr) {
+                let token = window.location.pathname.substr(1);
+                xhr.setRequestHeader ("Authorization", "Bearer " + token);
+                return xhr;
+            },
+            successTest: function(response) {
+                return !response.error;
+            },
+            onSuccess: function(response) {
+                $(this).addClass("disabled").children(".icon").removeClass("trash").addClass("check");
+            },
+        });
+    </script>
+    {{/if}}
 </body>
 </html>

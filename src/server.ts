@@ -5,7 +5,7 @@ import * as parser from "body-parser";
 import * as path from "path";
 import * as hbs from "express-handlebars";
 import {Database} from "sqlite3";
-import {addScore, getScores, Score} from "./scores";
+import {addScore, getScores, Score, findScore, deleteScore} from "./scores";
 import * as bearerToken from "express-bearer-token";
 
 const db = new Database("data/scores.db", (error: Error) => { if(error) throw error; });
@@ -28,17 +28,33 @@ app.use(parser.urlencoded({ extended: true }));
  */
 app.get("/", async (req: Request, res: Response) => {
     res.render("scores", {
-        scores: await getScores(100)
+        scores: await getScores(),
+        review: false
     });
+});
+
+/**
+ * WebUI review page.
+ */
+app.get("/:token", async (req: Request, res: Response, next) => {
+    if(app.get("token") == req.params.token) {
+        res.render("scores", {
+            scores: await getScores(),
+            review: true
+        });
+    } else {
+        next();
+    }
 });
 
 /**
  * Listing all scores.
  */
-app.get("/api", async (req: Request, res: Response) => {
+app.get("/api/:amount?", async (req: Request, res: Response) => {
     let scores;
     try {
-        scores = await getScores(50);
+        let amount = req.params.amount ? req.params.amount : 50;
+        scores = await getScores(amount);
     } catch(e) {
         res.status(500);
         res.json({error: true, code: 500, description: "Internal Server Error"});
@@ -54,7 +70,7 @@ app.put("/api", async (req: Request, res: Response) => {
     if((<any>req).token != app.get("token")) {
         res.status(401);
         res.json({error: true, code: 401, description: "Unauthorized"});
-        console.warn("denied request with wrong token from " + req.ip);
+        console.warn("denied put request with wrong token from " + req.ip);
         return;
     }
 
@@ -74,6 +90,28 @@ app.put("/api", async (req: Request, res: Response) => {
         console.error(e);
     }
     res.json({error: false, position: score.position});
+});
+
+/**
+ * Deleting an existing score.
+ */
+app.delete("/api/:id", async (req: Request, res: Response) => {
+    if((<any>req).token != app.get("token")) {
+        res.status(401);
+        res.json({error: true, code: 401, description: "Unauthorized"});
+        console.warn("denied delete request with wrong token from " + req.ip);
+        return;
+    }
+
+    let score = await findScore(req.params.id);
+    try {
+        deleteScore(score);
+    } catch(e) {
+        res.status(500);
+        res.json({error: true, code: 500, description: "Internal Server Error"});
+        console.error(e);
+    }
+    res.json({error: false});
 });
 
 /**
