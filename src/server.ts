@@ -38,7 +38,7 @@ app.get("/", async (req: Request, res: Response) => {
 app.get("/api", async (req: Request, res: Response) => {
     let scores;
     try {
-        scores = await getScores(10);
+        scores = await getScores(50);
     } catch(e) {
         res.status(500);
         res.json({error: true, code: 500, description: "Internal Server Error"});
